@@ -1,0 +1,46 @@
+from typing import Final
+from CustomTypes import ElementDictionary
+
+#Unknown values use 1 as gamma value, following Wade and Wood (2005)
+#Updated using data from https://norris.org.au/expet/metalact/?p=gamma_zeros
+GammaValues: Final[ElementDictionary] = {
+    "Ag" : 318.8,
+    "Al" : 0.049,
+    "As" : 0.0730,
+    "B" : 0.022,
+    "Bi" : 11792,
+    "C" : 0.538,
+    "Ca" : 2270,
+    "Cd" : 132,
+    "Ce" : 0.322,
+    "Co" : 0.55,
+    "Cr" : 1,
+    "Cu" : 8.58,
+    "Ga" : 0.6,
+    "Ge" : 0.02,
+    "H" : 1,
+    "Hf" : 1,
+    "In" : 27.4,
+    "La" : 9.3,
+    "Mn" : 1.44,
+    "Mo" : 1,
+    "N" : 1,
+    "Nb" : 0.2,
+    "Ni" : 0.66,
+    "O" : 1,
+    "P" : 1,
+    "Pb" : 1107,
+    "Re" : 1,
+    "S" : 1,
+    "Sb" : 0.41,
+    "Si" : 0.0045,
+    "Sn" : 2.58,
+    "Ta" : 0.04,
+    "Ti" : 0.004,
+    "Tl" : 25483,
+    "U" : 0.027,
+    "V" : 0.08,
+    "W" : 3,
+    "Zn" : 2.31,
+    "Zr" : 0.037
+}
