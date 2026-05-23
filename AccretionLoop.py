@@ -6,17 +6,14 @@ import time
 import warnings
 
 from Conversions import CompositionInPpm, MantleAndCoreDictionaries, calculateRelativeMass
-from Conversions import calculateMoles
-from Conversions import calculateMolarFraction
-from Conversions import calculateMolesToPPM
+from Conversions import calculateMoles, calculateMolarFraction, calculateMolesToPPM
 from Conversions import deconstructCompounds
 from CustomTypes import AtomicWeightDictionary, ElementDictionary, KdDictionary
 from EventsList import Event, EventResult, Impactor
 from GammaValues import GammaValues
 from KdValues import KdValuesCorrected
 from KdValues import KdValuesUncorrected
-from MetalActivityCalculator import CalculatedGammaValues, CreateEpsDict, ElementOnElementInteraction, ReadEpsValues
-from MetalActivityCalculator import CalculateGammaValues
+from MetalActivityCalculator import CalculateGammaValues, CalculatedGammaValues, CreateEpsDict, ElementOnElementInteraction, ReadEpsValues
 from MetalActivityCorrectionRunner import CallKdCorrectionEquilibration, MetalActivityResult
 from MinorElements import CalculateMinorElements
 from OutputToExcel import ExcelWriter
@@ -98,7 +95,7 @@ class PlanetBuilder:
                 end: float = time.time()
                 print("Endtime:", (end-start)/60, "minutes")
             if impactorResult.equilibrate == False:
-                    ppmElements: CompositionInPpm = calculateMolesToPPM(molesMantleOld, molesCoreOld, self.updatedAtomicWeights)
+                    ppmElements: CompositionInPpm = calculateMolesToPPM(self.molesMantle, self.molesCore, self.updatedAtomicWeights)
                     ppmMantle: ElementDictionary = ppmElements.ppmMantle
                     ppmCore: ElementDictionary = ppmElements.ppmCore
                     self.coreSize: float = ppmElements.relativeCoreSize
@@ -172,6 +169,7 @@ class PlanetBuilder:
             return ImpactorResult(gammaFe=1, pressure=Pressure, temperature=Temperature, KdSiResult=0, KdNiResult=0, KdOResult=0, fO2=self.fO2, equilibrate=False)
         
         molesICore: ElementDictionary = currentEvent.ICoreToPMantle
+
         molesICoreToPCore: ElementDictionary = currentEvent.ICoreToPCore
         self.storeMolesICore: ElementDictionary = self.molesCore.copy()
 
@@ -183,7 +181,7 @@ class PlanetBuilder:
                 self.molesCore[key] = molesICoreToPCore[key]
 
         # Calculate the new equilibrated major element composition
-        # KD Correction on: the KD values are corrected for the activity of Fe in metal liquid 
+        # Kd Correction on: the Kd values are corrected for the activity of Fe in metal liquid 
         if self.input.settings.KdCorrectionEnabled:
             moleFractionCore: MantleAndCoreDictionaries = calculateMolarFraction(self.molesMantle, molesICore).core
             newGammaValues: CalculatedGammaValues = CalculateGammaValues(self.epsDictionary, GammaValues, Temperature, moleFractionCore)
@@ -233,7 +231,10 @@ class PlanetBuilder:
                 molesICore[key] = newICoreMinor[key]
                 self.storeMolesICore[key] = newICoreMinor[key]
             for key in molesICore:
-                self.molesCore[key] += molesICore[key]  
+                if key in self.molesCore:
+                    self.molesCore[key] += molesICore[key]  
+                else:
+                    self.molesCore[key] = molesICore[key]
                 self.storeMolesICore[key] = molesICore[key]
 
         # Calculate the new fO2

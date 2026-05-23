@@ -182,8 +182,8 @@ def CombineImpactorData(impactorInfoDict: dict[int, ImpactorType], impactorMantl
         impNumberDict[index] = TotalImpactorData(
             relativeMass=impactorInfoDict[index].relativeMass,
             relativeCoreSize=impactorInfoDict[index].relativeCoreSize,
-            mantleConcentrationsInPPM=impactorMantleDict[index],
-            coreConcentrationsInPPM=impactorCoreDict[index]
+            mantleConcentrationsInPPM= RemoveEmptyImpactorElements(impactorMantleDict[index]),
+            coreConcentrationsInPPM=RemoveEmptyImpactorElements(impactorCoreDict[index])
         )
     return impNumberDict
 
@@ -225,3 +225,6 @@ def ImportInputFile(path) -> Input:
     eventList: EventList = CreateEventList(events, totalImpData)
     eventConditions: EventConditions = CreateEventCondtions(events)
     return Input(eventList, settings, startcomp, eventConditions)
+
+def RemoveEmptyImpactorElements(dictionary: dict) -> dict:
+    return {key:value for key,value in dictionary.items() if value != 0}

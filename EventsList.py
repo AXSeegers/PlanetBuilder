@@ -68,9 +68,22 @@ class Impactor(Event):
             if self.partialEquilibration != 1:
                 self.ICoreToPCore[key] = self.impactorCoreMoles[key] * (1 - self.partialEquilibration)
             
-            # If there is no impactor core, or equilibration is turned off for a different reason, add the entire impactor core to the planetary core
-            if not self.equilibrate:
-                self.ICoreToPCore[key] = {}
-                self.ICoreToPMantle[key] = {}
+        # If there is no impactor core, or equilibration is turned off for a different reason, add the entire impactor core to the planetary core
+        if not self.equilibrate:
+            for key in self.ICoreToPMantle:
+                if key in molesMantle:
+                    molesMantle[key] += self.ICoreToPMantle[key]
+                elif key == 'Fe':
+                    molesMantle['FeO'] += self.ICoreToPMantle[key]
+                elif key == 'Ni':
+                    molesMantle['NiO'] += self.ICoreToPMantle[key]
+                elif key == 'Si':
+                    molesMantle['SiO2'] += self.ICoreToPMantle[key]
+                elif key == 'O':
+                    continue
+                else:
+                    molesMantle[key] = self.ICoreToPMantle[key]
+            self.ICoreToPCore[key] = {}
+            self.ICoreToPMantle[key] = {}
 
         return EventResult(molesMantle=molesMantle, ICoreToPMantle=self.ICoreToPMantle, ICoreToPCore=self.ICoreToPCore, equilibrate=self.equilibrate)
