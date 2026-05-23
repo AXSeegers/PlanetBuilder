@@ -3,7 +3,7 @@
 
 PlanetBuilder 1.0 is a free-to-use tool for modelling the differentiation of elements during planetary core formation processes. Adjusting the conditions and compositions of both the planetary body and impactors, as well as changing several other settings, can be done using an Excel file which is loaded into the program. However, additions to the program and/or more complex adjustments will have to be made within the code itself. As the model was built and tested for Earth-like conditions, working with extreme compositions/conditions (e.g. modelling exoplanets) might require the user to make code adjustments to accommodate these unique circumstances. For any of these more complex changes, we recommend that you be knowledgeable in Python. 
 
-The PlanetBuilder code is fully annotated to help users understand how each section of the model works. The theories and equations behind the model are explained in Seegers et al. (in press), whereas this guide is written to help users work with the model. All mentions of specific sections, tables and figures in this guide refer to that paper. 
+The PlanetBuilder code is fully annotated to help users understand how each section of the model works. The theories and equations behind the model are explained in Seegers et al. (under review), whereas this guide is written to help users work with the model. All mentions of specific sections, tables and figures in this guide refer to that paper. 
 
 If you have any further questions, you can contact the authors by sending an e-mail to a.x.seegers.vu@gmail.com.
 
@@ -19,19 +19,21 @@ Installation for new Python users:
 	For using PlanetBuilder, no advanced IDEs are required, so it mostly comes down to personal preference. Two good free-to-use options are:
 	- Visual Studio Code (https://code.visualstudio.com/) 
 	- PyCharm Community Edition (https://www.jetbrains.com/pycharm/) 
-3.	Download a package installer to manage the additional packages required for PlanetBuilder, such as pip (https://packaging.python.org/en/latest/tutorials/installing-packages/)  or Anaconda (https://www.anaconda.com/download)
+3.	Download a package installer to manage the additional packages required for PlanetBuilder, such as pip (https://packaging.python.org/en/latest/tutorials/installing-packages/) or Anaconda (https://www.anaconda.com/download)
 
 
 4.	Install numpy using Anaconda or a similar package installer/pip (https://numpy.org/install/#python-numpy-install-guide) 
 5.	Install Pandas using Anaconda or a similar package installer/pip (https://pandas.pydata.org/docs/getting_started/install.html) 
 6.	Check if Python is set as the interpreter language in your IDE, even though most IDEs will ask when the model is started or recognise the code as Python. 
 
-## Add Midaco to PlanetBuilder
-The Midaco dll files are not included in PlanetBuilder. Please download *'midacopy.dll'* from: https://www.midaco-solver.com/index.php/download
+## Add MIDACO to PlanetBuilder
+We used MIDACO solvers for the creation of PlanetBuilder, as it is fast and easy to install. However, it is possible to implement other solvers as well. To get started with MIDACO, please follow the steps below.
 
-PlanetBuilder uses two Midaco solvers, one for the main solver of the equilibrated composition, and a smaller version for the thermodynamic KdO (Frost et al. 2010) calculations. As these run simultaneously, two versions of *'midacopy.dll'* have to be placed in the main directory of PlanetBuilder:
-- Midaco for the main solver should be renamed to: *'midacopyPB.dll'*
-- Midaco for the thermodynamic KdO should be renamed to: *'midacopyFrost.dll'*
+The MIDACO files are not included in PlanetBuilder. Please download the correct file depending on your OS from: https://www.midaco-solver.com/index.php/download. For Windows: *'midacopy.dll'*, and for Linux/Mac:  *'midacopy.so'*
+
+PlanetBuilder uses two MIDACO solvers, one for the main solver of the equilibrated composition, and a smaller version for the thermodynamic KdO (Frost et al. 2010) calculations. As these run simultaneously, two versions of the MIDACO file have to be placed in the main directory of PlanetBuilder:
+- MIDACO file for the main solver should be renamed to: *'midacopyPB.dll'* for Windows or *'midacopyPB.so'* for Linux/Mac
+- MIDACO file for the thermodynamic KdO should be renamed to: *'midacopyFrost.dll'*
 
 ## Using the PlanetBuilder input files
 The *'InputFile.xlsx'* file is located in the main directory of PlanetBuilder. All the options and information needed to run the program are in this file. Basic data and settings can be adjusted if this is done within the appropriate cells dedicated for these variables. Other cells are not read or taken into account, and missing or wrong input will raise exceptions or errors that need to be addressed. Adjusting the names of any of the yellow-coloured cells will cause the program to crash. We advise keeping the input file in the main directory to avoid permission errors. It is not necessary to keep the original name of the input file, as long as the filename is also adjusted in '\__main\__.py.'
@@ -43,7 +45,7 @@ Although the minor elements are optional and can be adjusted, the major elements
 -	Output file name: 
 	The name should adhere to naming conventions of e.g. Word and Excel. Do not add .xlsx or other extensions behind the name, as this will be automatically generated.
 -	Program settings:
-	The Kd corrected for γFe field gives the option to run PlanetBuilder with or without the corrections for the activity of Fe in metal. It’s not possible to run both at the same time. More information on the implications of these adjustments for Kd values is provided in Seegers et al., (in press) 
+	The Kd corrected for γFe field gives the option to run PlanetBuilder with or without the corrections for the activity of Fe in metal. It’s not possible to run both at the same time. More information on the implications of these adjustments for Kd values is provided in Seegers et al., (under review) 
 
 *'Planet starting composition'*: This sheet describes the composition and state of the planetary body at the start of the program. 
 -	Mantle elements/oxides: Which elements/oxides make up the planetary mantle at the start of the program? It is important to only use elements and their official notation from the periodic table. For oxides and other compounds, subscripts should be entered as numbers, and will be taken into account when calculating the molecular weight of the oxide or compound. 
@@ -80,7 +82,7 @@ There are multiple files in the PlanetBuilder folder, each with its own part of 
 
 The program starts with '\__main\__.py', which reads the input file and passes the processed input to *'AccretionLoop.py'*. The *'AccretionLoop.py'* is responsible for connecting most of the other files. It is sorted into accretion steps and arranges everything that needs to be taken care of to calculate the equilibrated planetary composition for each accretion step. At the start of every step, it reads the *'EventsList.py'*, which provides the information on which event must take place. Although adding an impactor to the planet is the only type of possible event in the current version of PlanetBuilder, *'EventsList.py'* is written in a way that allows other types of events to be added. 
 
-Once the impactor is added to the planetary mantle, the equilibration between the impactor core and the new planetary mantle can start. If ideal activity behaviour is assumed, the Kd values are calculated from *'KdValuesUncorrected'* function in *'KdValues.py'*, and passed to *'StandardEquilibrationRunner.py'*. When corrections for activity behaviour in metal have to be incorporated, the γ values are calculated in *MetalActivityCalculator.py*, and the *'KdValuesCorrected'* function in *KdValues.py* is used instead. Subsequently the *MetalActivityCorrectionRunner.py* is used to systematically adjust metal activity corrections and recalculate equilibrated compositions (Sect. 2.4 and Sect. 3.2). *'MidacoRunnerPlanetBuilder.py'* is the primary Midaco solver (Schleuter et al., 2013) that equilibrates the major element compositions (Sect. 2.3 and Fig. 2). This solver uses a smaller secondary Midaco solver (*MidacoRunnerFrost.py*) for deriving the thermodynamic KdO and using it to check if the hypothetical compositions are in equilibrium (Sect. 2.3.2). Afterwards, the equilibrated compositions are returned to either the *'StandardEquilibrationRunner.py'* or *'MetalActivityCorrectionRunner.py'* files. While the former will immediately return the equilibrated compositions to *'AccretionLoop.py'*, the latter adjusts the metal activity corrections and calls on *'MidacoRunnerPlanetBuilder.py'* multiple times. If the composition cannot equilibrate due to oxidation (Sect 3.3), this file will add the impactor core composition to the planetary mantle. 
+Once the impactor is added to the planetary mantle, the equilibration between the impactor core and the new planetary mantle can start. If ideal activity behaviour is assumed, the Kd values are calculated from *'KdValuesUncorrected'* function in *'KdValues.py'*, and passed to *'StandardEquilibrationRunner.py'*. When corrections for activity behaviour in metal have to be incorporated, the γ values are calculated in *MetalActivityCalculator.py*, and the *'KdValuesCorrected'* function in *KdValues.py* is used instead. Subsequently the *MetalActivityCorrectionRunner.py* is used to systematically adjust metal activity corrections and recalculate equilibrated compositions (Sect. 2.4 and Sect. 3.2). *'MidacoRunnerPlanetBuilder.py'* is the primary MIDACO solver (Schleuter et al., 2013) that equilibrates the major element compositions (Sect. 2.3 and Fig. 2). This solver uses a smaller secondary MIDACO solver (*MidacoRunnerFrost.py*) for deriving the thermodynamic KdO and using it to check if the hypothetical compositions are in equilibrium (Sect. 2.3.2). Afterwards, the equilibrated compositions are returned to either the *'StandardEquilibrationRunner.py'* or *'MetalActivityCorrectionRunner.py'* files. While the former will immediately return the equilibrated compositions to *'AccretionLoop.py'*, the latter adjusts the metal activity corrections and calls on *'MidacoRunnerPlanetBuilder.py'* multiple times. If the composition cannot equilibrate due to oxidation (Sect 3.3), this file will add the impactor core composition to the planetary mantle. 
 
 *'MinorElements.py'* is responsible for calculating the equilibration of the minor elements based on the equilibrated major element composition returned by *'MidacoRunnerPlanetBuilder.py'*. Afterwards, the equilibrated impactor core is added to the planetary core, and the resulting planetary composition is written to an output Excel file through *'OutputToExcel.py'*.
 
@@ -96,7 +98,7 @@ The other files in the folder are support files that are called upon in various 
 ## Errors and troubleshooting
 Within any program or model, errors can occur. For inexperienced users, these might be hard to identify and solve. Fortunately, most IDEs will give an error message with regard to which line of code returns the error. This allows for backtracing the error. When you find any significant errors, please send a message to the authors with the error message, when you received these errors, and a copy of your input file. We ask for the latter, as errors are often caused by incorrect variable settings in the input file. 
 
-Regardless of the error, we recommend running the program again in debug mode and using breakpoints to pause the model and review the data up until that point manually. More information on debugging code can be found on the websites of the IDEs and Python itself. 
+We always recommend running the program again in debug mode and using breakpoints to pause the model and review the data up until that point manually. More information on debugging code can be found on the websites of the IDEs and Python itself. 
 
 ## Notes on additions and advanced adjustments to the model
 Adding new modules, data, combining models or making other adjustments will require modification of the code. We advise only doing this with sufficient experience in Python. 
@@ -109,4 +111,4 @@ Below is a short list with several recommendations on where to add common calcul
 ## References
 - 	Norris, C. A.: Metal Activity Calculator, http://www.earth.ox.ac.uk/ expet/metalact/, 2017.
 - 	Schlueter, M., Erb, S., Gerdts, M., Kemble, S., and Ruckmann, J. J.: MIDACO on MINLP Space Applications, Advances in Space Research, 51, 1116–1131, https://doi.org/10.1016/j.asr.2012.11.006, 2013
-- 	Seegers, A. X., Vroon, P. Z., van Westrenen, W.: PlanetBuilder 1.0: An open-source model to analyse the geochemical evolution of rocky planets during accretion and core formation, in press
+- 	Seegers, A. X., Vroon, P. Z., van Westrenen, W.: PlanetBuilder 1.0: An open-source model to analyse the geochemical evolution of rocky planets during accretion and core formation, under review

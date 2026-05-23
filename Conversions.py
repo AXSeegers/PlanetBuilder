@@ -90,13 +90,9 @@ def calculateMolesToPPM (molesMantle : ElementDictionary, molesCore: ElementDict
 
     for key in molesMantle:
         percentageMantle[key] = molesMantle[key] * atomicWeights[key]
-    else:     
-        percentageMantle[key] += molesMantle[key] * atomicWeights[key]
 
     for key in molesCore:
         percentageCore[key] = molesCore[key] * atomicWeights[key]
-    else:
-        percentageCore[key] += molesCore[key] * atomicWeights[key]
 
     totalMantle: float = sum(percentageMantle.values())
     totalCore: float = sum(percentageCore.values())
